@@ -96,8 +96,38 @@ def run_whisper_job(job):
                 word_timestamps=job_input["word_timestamps"],
             )
             print("Debug - Whisper results:", whisper_results)
+            
+            # Validate response format
+            required_fields = ["segments", "detected_language", "transcription", "device", "model"]
+            missing_fields = [field for field in required_fields if field not in whisper_results]
+            if missing_fields:
+                error_msg = f"Missing required fields in response: {missing_fields}"
+                print(error_msg)
+                return {"error": error_msg}
+                
+            # Check response size
+            import sys
+            response_size = sys.getsizeof(str(whisper_results))
+            print(f"Debug - Response size: {response_size} bytes")
+            
+            # Validate segments format
+            if not isinstance(whisper_results["segments"], list):
+                error_msg = "Invalid segments format - expected list"
+                print(error_msg)
+                return {"error": error_msg}
+                
+            for segment in whisper_results["segments"]:
+                required_segment_fields = ["id", "text", "start", "end"]
+                missing_segment_fields = [field for field in required_segment_fields if field not in segment]
+                if missing_segment_fields:
+                    error_msg = f"Missing required fields in segment: {missing_segment_fields}"
+                    print(error_msg)
+                    return {"error": error_msg}
+
         except Exception as e:
             print(f"Error during prediction: {str(e)}")
+            import traceback
+            print(f"Full traceback: {traceback.format_exc()}")
             return {"error": f"Prediction failed: {str(e)}"}
 
     with rp_debugger.LineTimer("cleanup_step"):
