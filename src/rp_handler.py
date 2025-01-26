@@ -133,7 +133,8 @@ def run_whisper_job(job):
     with rp_debugger.LineTimer("cleanup_step"):
         rp_cleanup.clean(["input_objects"])
 
-    return whisper_results
+    # Wrap the results in the required 'output' field for RunPod
+    return {"output": whisper_results}
 
 
 runpod.serverless.start({"handler": run_whisper_job})
