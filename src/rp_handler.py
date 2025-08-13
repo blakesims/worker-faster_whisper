@@ -29,7 +29,7 @@ def base64_to_tempfile(base64_file: str) -> str:
     Returns:
     str: Path to tempfile
     '''
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
+    with tempfile.NamedTemporaryFile(suffix=".ogg", delete=False) as temp_file:
         temp_file.write(base64.b64decode(base64_file))
 
     return temp_file.name
